@@ -10,12 +10,11 @@ namespace LP_Lab03v2
             X = 0;
             Y = 0;
         }
-        public Point(double x,double y)
+
+        public Point(double x, double y)
         {
             X = x;
             Y = y;
         }
-        
-        
     }
 }

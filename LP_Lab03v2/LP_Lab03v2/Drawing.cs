@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
 using Lp_Lab01;
@@ -20,7 +18,7 @@ namespace LP_Lab03v2
             _points = new List<Point>();
         }
 
-        private List<Point> WorldToLocal(Chart myChart)
+        private List<Point> LocalToWorld(Chart myChart)
         {
             CMatrix cMatrix = new CMatrix(3, _points.Count);
             for (int i = 0; i < 1; i++)
@@ -51,14 +49,10 @@ namespace LP_Lab03v2
             double xMin = 0;
             double yMax = 0;
             double yMin = 0;
-
-
             xMax = cMatrix.MaxElement(0, 1, cMatrix.Cols);
             xMin = cMatrix.MinElement(0, 1, cMatrix.Cols);
-
             yMax = cMatrix.MaxElement(1, 2, cMatrix.Cols);
             yMin = cMatrix.MinElement(1, 2, cMatrix.Cols);
-
             double xMinWind = myChart.Location.X;
             double xMaxWind = myChart.Location.X + myChart.Width;
             double yMinWind = myChart.Location.Y;
@@ -93,7 +87,7 @@ namespace LP_Lab03v2
             return listOfConvertedPoints;
         }
 
-        public void DrawingFuncInWorld()
+        public void DrawingFuncInLocal()
         {
             Chart myChart = new Chart();
             _points.Clear();
@@ -105,17 +99,17 @@ namespace LP_Lab03v2
             mySeriesOfPoint.ChartArea = "Math functions";
 
             for (double x = -6; x <= 6; x += 0.1)
-            {
+            { // поменять функцию и все тип топ  
                 Point point = new Point(x, Math.Sin(Math.PI * x) * Math.Sqrt(Math.Abs(x)));
                 _points.Add(point);
                 mySeriesOfPoint.Points.AddXY(point.X, point.Y);
             }
 
             myChart.Series.Add(mySeriesOfPoint);
-            DrawingFuncInLocal(myChart);
+            DrawingFuncInWorld(myChart);
         }
 
-        public void DrawingFuncInLocal(Chart first)
+        public void DrawingFuncInWorld(Chart first)
         {
             Chart myChart = new Chart();
             myChart.Parent = _form;
@@ -124,18 +118,19 @@ namespace LP_Lab03v2
             Series mySeriesOfPoint = new Series("Sinus2");
             mySeriesOfPoint.ChartType = SeriesChartType.Line;
             mySeriesOfPoint.ChartArea = "Math functions2";
-            var listOfConvertedPoints = WorldToLocal(myChart);
+            var listOfConvertedPoints = LocalToWorld(myChart);
             for (int i = 0; i < listOfConvertedPoints.Count; i++)
             {
                 double x = listOfConvertedPoints.ElementAt(i).X;
                 double y = listOfConvertedPoints.ElementAt(i).Y;
-                mySeriesOfPoint.Points.AddXY(x, y);
+                mySeriesOfPoint.Points.AddXY(x, -y);
             }
+
             //Добавляем созданный набор точек в Chart
             myChart.Series.Add(mySeriesOfPoint);
         }
 
-        public void DrawingPictureInWorld()
+        public void DrawingPictureInLocal()
         {
             _points.Clear();
             Chart myChart = new Chart();
@@ -147,24 +142,26 @@ namespace LP_Lab03v2
             Series mySeries = new Series("house in world");
             mySeries.ChartArea = "Houses";
             mySeries.ChartType = SeriesChartType.Line;
-            _points.Add(new Point(-2,0));
-            _points.Add(new Point(2,0));
-            _points.Add(new Point(2,-4));
-            _points.Add(new Point(-2,-4));
-            _points.Add(new Point(-2,0));
-            _points.Add(new Point(-3,0));
-            _points.Add(new Point(0,4));
-            _points.Add(new Point(3,0));
-            _points.Add(new Point(2,0));
+            _points.Add(new Point(-2, 0));
+            _points.Add(new Point(2, 0));
+            _points.Add(new Point(2, -4));
+            _points.Add(new Point(-2, -4));
+            _points.Add(new Point(-2, 0));
+            _points.Add(new Point(-3, 0));
+            _points.Add(new Point(0, 4));
+            _points.Add(new Point(3, 0));
+            _points.Add(new Point(2, 0));
 
             foreach (var point in _points)
             {
-                mySeries.Points.AddXY(point.X,point.Y);
+                mySeries.Points.AddXY(point.X, point.Y);
             }
+
             myChart.Series.Add(mySeries);
-            DrawingPictureInLocal(myChart);
+            DrawingPictureInWorld(myChart);
         }
-        public void DrawingPictureInLocal(Chart first)
+
+        public void DrawingPictureInWorld(Chart first)
         {
             Chart myChart = new Chart();
             myChart.Parent = _form;
@@ -175,11 +172,12 @@ namespace LP_Lab03v2
             Series mySeries = new Series("house in local");
             mySeries.ChartArea = "Houses";
             mySeries.ChartType = SeriesChartType.Line;
-             var resultSeries = WorldToLocal(myChart);
-             foreach (var point in resultSeries)
-             {
-                 mySeries.Points.AddXY(point.X,point.Y);
-             }
+            var resultSeries = LocalToWorld(myChart);
+            foreach (var point in resultSeries)
+            {
+                mySeries.Points.AddXY(point.X, -point.Y);
+            }
+
             myChart.Series.Add(mySeries);
         }
     }
